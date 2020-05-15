@@ -13,7 +13,10 @@ export default () => {
 
     const handleScroll = (e, next = true) => {
         e.preventDefault();
+
+        const boxWidth = refScroll.current.scrollWidth - 200;
         startScrolling = true;
+
 
         const prepareValScroll = (val, add=0) => {
             if (val <= 0) {
@@ -22,17 +25,24 @@ export default () => {
             return val;
         }
 
-        const eventScrolling = () => {            
+        const eventScrolling = () => {     
+            
+            console.log(positionScroll);
+           console.log(boxWidth);
+
             if (next) {
                 positionScroll += 50;
                 refScroll.current.scroll(prepareValScroll(positionScroll, 50), 0);
             } else {
-                positionScroll -= 50;            
+                positionScroll -= 50;                
                 refScroll.current.scroll(prepareValScroll(positionScroll), 0);
             }
         }
 
         const timeScrolling = () => {
+            if (next && positionScroll >= boxWidth) {
+                return false;
+            }
             if (startScrolling && positionScroll > 0) {
                 eventScrolling();
                 setTimeout(() => {
@@ -41,6 +51,10 @@ export default () => {
             }
         }
         
+        if ((next && positionScroll >= boxWidth)
+            || (!next && positionScroll <= 0)) {
+            return false;
+        }
         eventScrolling();
         timeScrolling();
     }
@@ -50,11 +64,11 @@ export default () => {
             <button
                 onMouseDown={(e) => handleScroll(e, false)}
                 onMouseUp={(e) => handleStopScrolling(e)}
-                >voltar</button>
+                >back</button>
             <button
                 onMouseDown={(e) => handleScroll(e)}
                 onMouseUp={(e) => handleStopScrolling(e)}
-            >avancar</button>
+            >forward</button>
 
             <div style={{
                 height: '100px',
@@ -62,7 +76,8 @@ export default () => {
                 backgroundColor: '#efefef',
                 padding: '10px 25px',
                 overflow: 'auto',
-                whiteSpace: 'noWrap'
+                whiteSpace: 'noWrap',
+                scrollBehavior: 'smooth'
             }}
                 ref={refScroll}
             >
